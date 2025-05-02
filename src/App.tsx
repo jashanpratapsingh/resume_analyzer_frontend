@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Container, CssBaseline, ThemeProvider, createTheme, Box, alpha } from '@mui/material';
+import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import ResumeAnalyzer from './components/ResumeAnalyzer';
 import Login from './components/Auth/Login';
 import SignUp from './components/Auth/SignUp';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
-import ResumeAnalyzer from './components/ResumeAnalyzer';
 
 const theme = createTheme({
   palette: {

@@ -8,7 +8,6 @@ import {
   ListItemText,
   Divider,
   Chip,
-  Grid,
 } from '@mui/material';
 import { ResumeAnalysis as ResumeAnalysisType, WorkExperience, Certification } from '../types';
 
