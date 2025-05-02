@@ -4,8 +4,11 @@ import ResumeAnalysis from './ResumeAnalysis';
 import { ResumeAnalysis as ResumeAnalysisType } from '../types';
 import { Alert, Box } from '@mui/material';
 
-// Get API URL from environment variables or use default
-const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://ai-resume-analyzer-claude.onrender.com';
+// Get API URL from environment variables with fallbacks
+const API_URL = import.meta.env.VITE_API_BASE_URL || 
+  (window.location.hostname === 'localhost' 
+    ? 'http://localhost:8000'
+    : 'https://resume-analyzer-backend-1.onrender.com');
 
 const ResumeAnalyzer: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,34 +18,35 @@ const ResumeAnalyzer: React.FC = () => {
   const handleUpload = async (file: File) => {
     setIsLoading(true);
     setError(null);
+    
     try {
       const formData = new FormData();
       formData.append('file', file);
       
-      // First check if the API is healthy
-      try {
-        const healthCheck = await fetch(`${API_URL}/health`);
-        if (!healthCheck.ok) {
-          throw new Error('API service is not available');
-        }
-      } catch (e) {
-        throw new Error('Could not connect to the API service');
-      }
+      console.log('Using API URL:', API_URL); // Debug log
 
       const response = await fetch(`${API_URL}/analyze`, {
         method: 'POST',
         body: formData,
+        headers: {
+          'Accept': 'application/json',
+        },
+        mode: 'cors',
       });
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(
-          errorData?.detail || `HTTP error! status: ${response.status}`
-        );
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.detail || errorMessage;
+        } catch (e) {
+          // If we can't parse the error response, use the default message
+        }
+        throw new Error(errorMessage);
       }
       
       const data = await response.json();
-      console.log('Raw response:', data);
+      console.log('Response data:', data); // Debug log
       
       if (!data) {
         throw new Error('No data received from server');
@@ -51,7 +55,17 @@ const ResumeAnalyzer: React.FC = () => {
       setAnalysis(data);
     } catch (error) {
       console.error('Error analyzing resume:', error);
-      setError(error instanceof Error ? error.message : 'An error occurred while analyzing the resume');
+      let errorMessage = 'An error occurred while analyzing the resume';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Unable to connect to the server. Please check your internet connection or try again later.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
