@@ -4,6 +4,9 @@ import ResumeAnalysis from './ResumeAnalysis';
 import { ResumeAnalysis as ResumeAnalysisType } from '../types';
 import { Alert, Box } from '@mui/material';
 
+// Get API URL from environment variables or use default
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://ai-resume-analyzer-claude.onrender.com';
+
 const ResumeAnalyzer: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<ResumeAnalysisType | null>(null);
@@ -16,24 +19,35 @@ const ResumeAnalyzer: React.FC = () => {
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/analyze`, {
+      // First check if the API is healthy
+      try {
+        const healthCheck = await fetch(`${API_URL}/health`);
+        if (!healthCheck.ok) {
+          throw new Error('API service is not available');
+        }
+      } catch (e) {
+        throw new Error('Could not connect to the API service');
+      }
+
+      const response = await fetch(`${API_URL}/analyze`, {
         method: 'POST',
         body: formData,
-        credentials: 'include',
       });
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => null);
+        throw new Error(
+          errorData?.detail || `HTTP error! status: ${response.status}`
+        );
       }
       
       const data = await response.json();
-      console.log('Raw response:', data); // Debug log
+      console.log('Raw response:', data);
       
       if (!data) {
         throw new Error('No data received from server');
       }
 
-      // The analysis is directly in the response, not nested
       setAnalysis(data);
     } catch (error) {
       console.error('Error analyzing resume:', error);
