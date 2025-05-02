@@ -9,38 +9,48 @@ import {
   Divider,
   Chip,
 } from '@mui/material';
-import { ResumeAnalysis as ResumeAnalysisType, WorkExperience, Certification } from '../types';
+import { ResumeAnalysis as ResumeAnalysisType } from '../types';
 
 interface ResumeAnalysisProps {
   analysis: ResumeAnalysisType;
 }
 
 const ResumeAnalysis: React.FC<ResumeAnalysisProps> = ({ analysis }) => {
+  console.log('Rendering analysis:', analysis); // Debug log
+
   return (
     <Box sx={{ mt: 4 }}>
       {/* Personal Information */}
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h5" gutterBottom>
           Personal Information
         </Typography>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-          <Box sx={{ flex: '1 1 200px' }}>
-            <Typography><strong>Name:</strong> {analysis.name}</Typography>
-          </Box>
-          <Box sx={{ flex: '1 1 200px' }}>
-            <Typography><strong>Email:</strong> {analysis.email}</Typography>
-          </Box>
-          <Box sx={{ flex: '1 1 200px' }}>
-            <Typography><strong>Phone:</strong> {analysis.phone}</Typography>
-          </Box>
-          <Box sx={{ flex: '1 1 200px' }}>
-            <Typography><strong>Location:</strong> {analysis.location}</Typography>
-          </Box>
-        </Box>
+        <List>
+          {analysis.name && (
+            <ListItem>
+              <ListItemText primary="Name" secondary={analysis.name} />
+            </ListItem>
+          )}
+          {analysis.email && (
+            <ListItem>
+              <ListItemText primary="Email" secondary={analysis.email} />
+            </ListItem>
+          )}
+          {analysis.phone && (
+            <ListItem>
+              <ListItemText primary="Phone" secondary={analysis.phone} />
+            </ListItem>
+          )}
+          {analysis.location && (
+            <ListItem>
+              <ListItemText primary="Location" secondary={analysis.location} />
+            </ListItem>
+          )}
+        </List>
       </Paper>
 
       {/* Education */}
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h5" gutterBottom>
           Education
         </Typography>
@@ -56,12 +66,14 @@ const ResumeAnalysis: React.FC<ResumeAnalysisProps> = ({ analysis }) => {
                         {edu.institution}
                       </Typography>
                       <br />
-                      <Typography component="span" variant="body2">
-                        {edu.field_of_study}
-                      </Typography>
+                      {edu.field_of_study && (
+                        <Typography component="span" variant="body2">
+                          {edu.field_of_study}
+                        </Typography>
+                      )}
                       <br />
                       <Typography component="span" variant="body2">
-                        {edu.start_date} - {edu.end_date}
+                        {edu.graduation_date}
                       </Typography>
                       {edu.gpa && (
                         <Typography component="span" variant="body2">
@@ -80,36 +92,40 @@ const ResumeAnalysis: React.FC<ResumeAnalysisProps> = ({ analysis }) => {
       </Paper>
 
       {/* Work Experience */}
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h5" gutterBottom>
           Work Experience
         </Typography>
         <List>
-          {analysis.work_experience.map((exp: WorkExperience, index: number) => (
+          {analysis.work_experience.map((exp, index) => (
             <React.Fragment key={index}>
               <ListItem>
                 <ListItemText
-                  primary={
-                    <Typography variant="h6">
-                      {exp.title} at {exp.company}
-                    </Typography>
-                  }
+                  primary={exp.position}
                   secondary={
                     <>
                       <Typography component="span" variant="body2">
-                        {exp.location}
+                        {exp.company}
                       </Typography>
                       <br />
                       <Typography component="span" variant="body2">
-                        {exp.start_date} - {exp.end_date || 'Present'}
+                        {exp.duration}
                       </Typography>
-                      <List dense>
-                        {exp.description.map((desc, i) => (
-                          <ListItem key={i}>
-                            <ListItemText primary={desc} />
-                          </ListItem>
-                        ))}
-                      </List>
+                      {exp.location && (
+                        <Typography component="span" variant="body2">
+                          <br />
+                          {exp.location}
+                        </Typography>
+                      )}
+                      {exp.description && exp.description.length > 0 && (
+                        <List dense>
+                          {exp.description.map((desc, i) => (
+                            <ListItem key={i}>
+                              <ListItemText primary={desc} />
+                            </ListItem>
+                          ))}
+                        </List>
+                      )}
                     </>
                   }
                 />
@@ -121,12 +137,12 @@ const ResumeAnalysis: React.FC<ResumeAnalysisProps> = ({ analysis }) => {
       </Paper>
 
       {/* Skills */}
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h5" gutterBottom>
           Skills
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-          {analysis.skills.map((skill: { name: string; years_of_experience?: number; category?: string }, index: number) => (
+          {analysis.skills.map((skill, index) => (
             <Chip
               key={index}
               label={`${skill.name}${skill.years_of_experience ? ` (${skill.years_of_experience} years)` : ''}`}
@@ -138,13 +154,13 @@ const ResumeAnalysis: React.FC<ResumeAnalysisProps> = ({ analysis }) => {
       </Paper>
 
       {/* Certifications */}
-      {analysis.certifications.length > 0 && (
-        <Paper sx={{ p: 3, mb: 3 }}>
+      {analysis.certifications && analysis.certifications.length > 0 && (
+        <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
           <Typography variant="h5" gutterBottom>
             Certifications
           </Typography>
           <List>
-            {analysis.certifications.map((cert: Certification, index: number) => (
+            {analysis.certifications.map((cert, index) => (
               <React.Fragment key={index}>
                 <ListItem>
                   <ListItemText
@@ -152,18 +168,20 @@ const ResumeAnalysis: React.FC<ResumeAnalysisProps> = ({ analysis }) => {
                     secondary={
                       <>
                         <Typography component="span" variant="body2">
-                          {cert.issuer}
+                          {cert.issuing_organization}
                         </Typography>
-                        <br />
-                        <Typography component="span" variant="body2">
-                          {cert.date_obtained}
-                          {cert.expiration_date && ` - ${cert.expiration_date}`}
-                        </Typography>
+                        {cert.date_obtained && (
+                          <Typography component="span" variant="body2">
+                            <br />
+                            {cert.date_obtained}
+                            {cert.expiration_date && ` - ${cert.expiration_date}`}
+                          </Typography>
+                        )}
                       </>
                     }
                   />
                 </ListItem>
-                {index < analysis.certifications.length - 1 && <Divider />}
+                {index < (analysis.certifications?.length ?? 0) - 1 && <Divider />}
               </React.Fragment>
             ))}
           </List>
@@ -171,14 +189,14 @@ const ResumeAnalysis: React.FC<ResumeAnalysisProps> = ({ analysis }) => {
       )}
 
       {/* Languages */}
-      {analysis.languages.length > 0 && (
-        <Paper sx={{ p: 3, mb: 3 }}>
+      {analysis.languages && analysis.languages.length > 0 && (
+        <Paper elevation={3} sx={{ p: 3 }}>
           <Typography variant="h5" gutterBottom>
             Languages
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {analysis.languages.map((lang: string, index: number) => (
-              <Chip key={index} label={lang} />
+            {analysis.languages.map((lang, index) => (
+              <Chip key={index} label={lang} color="secondary" />
             ))}
           </Box>
         </Paper>

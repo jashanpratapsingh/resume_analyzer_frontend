@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
-import ResumeAnalyzer from './components/ResumeAnalyzer';
+import ResumeAnalyzer from './components/ResumeAnalyzer.tsx';
 import Login from './components/Auth/Login';
 import SignUp from './components/Auth/SignUp';
 import ProtectedRoute from './components/Auth/ProtectedRoute';

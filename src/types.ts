@@ -1,33 +1,28 @@
 export interface Education {
-  institution: string;
   degree: string;
+  institution: string;
+  graduation_date: string;
   field_of_study?: string;
-  start_date?: string;
-  end_date?: string;
-  gpa?: number;
+  gpa?: string;
 }
 
 export interface WorkExperience {
+  position: string;
   company: string;
-  title: string;
-  start_date: string;
-  end_date?: string;
-  description: string[];
+  duration: string;
   location?: string;
-  is_current: boolean;
+  description?: string[];
 }
 
 export interface Skill {
   name: string;
-  category: string;
+  category?: string;
   years_of_experience?: number;
-  proficiency_level?: string;
-  last_used?: string;
 }
 
 export interface Certification {
   name: string;
-  issuer: string;
+  issuing_organization: string;
   date_obtained?: string;
   expiration_date?: string;
 }
@@ -37,12 +32,9 @@ export interface ResumeAnalysis {
   email?: string;
   phone?: string;
   location?: string;
-  summary?: string;
   education: Education[];
   work_experience: WorkExperience[];
   skills: Skill[];
-  certifications: Certification[];
-  languages: string[];
-  missing_sections: string[];
-  analysis_date: string;
+  certifications?: Certification[];
+  languages?: string[];
 } 
